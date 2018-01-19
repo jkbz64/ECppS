@@ -1,7 +1,6 @@
 #ifndef ECPPS_CONTEXT_HPP
 #define ECPPS_CONTEXT_HPP
 
-#include <queue>
 #include <SystemDef.hpp>
 #include <System.hpp>
 #include <EntityStorage.hpp>
@@ -14,9 +13,13 @@ public:
     ~Context();
     
     void addSystem(const SystemDef&);
+    void removeSystem(const SystemDef&);
+    System& getSystem(const SystemDef&);
+    
+    void step(sol::function);
 private:
     EntityStorage m_storage;
-    std::unordered_map<SystemDef, System, SystemDef::Hasher> m_systems;
+    std::unordered_map<SystemDef, System, SystemDef::Hasher, SystemDef::Comparator> m_systems;
     std::unique_ptr<Step> m_step;
 };
 

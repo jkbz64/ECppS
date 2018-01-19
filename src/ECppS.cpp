@@ -6,6 +6,7 @@
 #include <EntityStorage.hpp>
 #include <SystemDef.hpp>
 #include <System.hpp>
+#include <Context.hpp>
 
 namespace
 {
@@ -160,6 +161,17 @@ sol::table ECppS::createModule(sol::this_state L)
                                 //"addDependency", &System::addDependency,
     );
     
+    module.new_usertype<Context>("Context",
+                                 "new", sol::constructors<Context()>(),
+                                 "addSystem", &Context::addSystem,
+                                 "removeSystem", &Context::removeSystem,
+                                 "getSystem", &Context::getSystem
+    );
+    
+    module.new_usertype<Step>("Step",
+                              "new", sol::no_constructor,
+                              "process", &Step::process
+    );
     return module;
 }
 

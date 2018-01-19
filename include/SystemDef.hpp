@@ -13,8 +13,14 @@ class SystemDef
 public:
     struct Hasher
     {
-        std::size_t operator()(const SystemDef& def) const;
+        std::size_t operator()(const SystemDef&) const;
     };
+    
+    struct Comparator
+    {
+        bool operator()(const SystemDef&, const SystemDef&) const noexcept;
+    };
+    
     SystemDef();
     ~SystemDef() = default;
     

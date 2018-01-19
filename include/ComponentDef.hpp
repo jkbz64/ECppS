@@ -20,8 +20,6 @@ public:
     ComponentDef(sol::this_state, std::string);
     ~ComponentDef();
     
-    bool operator==(const ComponentDef&);
-    
     const std::size_t& id() const;
     const std::string& name() const;
     

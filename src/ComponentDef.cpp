@@ -137,11 +137,6 @@ const std::string& ComponentDef::name() const
     return m_name;
 }
 
-bool ComponentDef::operator==(const ComponentDef &other)
-{
-    return m_ID == other.m_ID;
-}
-
 std::size_t ComponentDef::Hasher::operator()(const ComponentDef &def) const noexcept
 {
     return def.m_ID;

@@ -47,3 +47,8 @@ std::size_t SystemDef::Hasher::operator()(const SystemDef &def) const
 {
     return def.m_ID;
 }
+
+bool SystemDef::Comparator::operator()(const SystemDef &a, const SystemDef &b) const noexcept
+{
+    return a.m_ID == b.m_ID;
+}
