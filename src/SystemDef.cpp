@@ -27,7 +27,7 @@ SystemDef& SystemDef::write(const ComponentDef &def)
 
 SystemDef& SystemDef::depends(const SystemDef &def)
 {
-    m_dependencies.emplace(def.id());
+    m_dependencies.emplace(def);
     return *this;
 }
 
@@ -39,7 +39,7 @@ SystemDef& SystemDef::init(sol::function f)
 
 SystemDef& SystemDef::process(sol::function f)
 {
-    
+    m_process = f;
     return *this;
 }
 
@@ -51,4 +51,9 @@ std::size_t SystemDef::Hasher::operator()(const SystemDef &def) const
 bool SystemDef::Comparator::operator()(const SystemDef &a, const SystemDef &b) const noexcept
 {
     return a.m_ID == b.m_ID;
+}
+
+bool SystemDef::Less::operator()(const SystemDef &a, const SystemDef &b) const noexcept
+{
+    return a.m_ID < b.m_ID;
 }

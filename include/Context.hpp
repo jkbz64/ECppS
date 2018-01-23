@@ -12,9 +12,12 @@ public:
     Context();
     ~Context();
     
-    void addSystem(const SystemDef&);
+    void addSystem(const SystemDef&, sol::variadic_args);
     void removeSystem(const SystemDef&);
     System& getSystem(const SystemDef&);
+    bool hasSystem(const SystemDef&);
+    
+    void setStep(Step*);
     
     void step(sol::function);
 private:

@@ -1,7 +1,6 @@
 #ifndef ECPPS_COMPONENT_HPP
 #define ECPPS_COMPONENT_HPP
 
-#include <cstddef>
 #include <unordered_map>
 #include <sol/state_view.hpp>
 

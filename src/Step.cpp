@@ -1,13 +1,35 @@
 #include <Step.hpp>
 #include <sol/variadic_args.hpp>
 #include <Context.hpp>
-#include <System.hpp>
+#include <Task.hpp>
 
-void Step::process(const SystemDef &def, sol::variadic_args args)
+namespace
 {
-    m_actions.emplace_back([def, args](Context& context) -> SystemPair
-                           {
-                               std::reference_wrapper<System> ref = context.getSystem(def);
-                               return std::make_tuple(ref, args);
-                           });
+
 }
+
+Step::Step(AbstractQueue* queue) :
+    m_queue(queue)
+{
+
+}
+
+Step::~Step() = default;
+
+void Step::process(const SystemDef &def)
+{
+    if(m_context->hasSystem(def))
+    {
+        auto& system = m_context->getSystem(def);
+        for(auto& dep : def.m_dependencies)
+            process(dep);
+    
+        m_tasks.emplace_back([doneSystems = std::reference_wrapper<DoneSystems>(m_doneSystems), this, &system]()
+        {
+            m_queue->enqueue(Task(system, doneSystems, sol::variadic_args()));
+        });
+    }
+    else
+        throw std::runtime_error("Trying to process system which doesn't exist in context");
+}
+

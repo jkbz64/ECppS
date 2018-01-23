@@ -2,11 +2,8 @@
 #define ECPPS_SYSTEMDEF_HPP
 
 #include <cstddef>
-#include <set>
 #include <sol/function.hpp>
-
-class System;
-class ComponentDef;
+#include <fwd.hpp>
 
 class SystemDef
 {
@@ -17,6 +14,11 @@ public:
     };
     
     struct Comparator
+    {
+        bool operator()(const SystemDef&, const SystemDef&) const noexcept;
+    };
+    
+    struct Less
     {
         bool operator()(const SystemDef&, const SystemDef&) const noexcept;
     };
@@ -32,9 +34,15 @@ public:
     SystemDef& depends(const SystemDef&);
     SystemDef& process(sol::function);
 private:
+    friend class Context;
+    friend class Step;
+    friend class Task;
+    friend class System;
     std::size_t m_ID;
     std::function<void(System&, sol::variadic_args)> m_init;
-    std::set<std::size_t> m_dependencies;
+    std::function<void()> m_process;
+    std::set<SystemDef, SystemDef::Less> m_dependencies;
+    
     std::set<std::size_t> m_reads;
     std::set<std::size_t> m_writes;
 };

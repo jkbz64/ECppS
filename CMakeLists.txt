@@ -27,6 +27,7 @@ target_include_directories(ECppS PUBLIC
 				${CMAKE_SOURCE_DIR}/include/
 				${LUA53_INCLUDE_DIR}
 				${CMAKE_SOURCE_DIR}/lib/sol2/
+				${CMAKE_SOURCE_DIR}/lib
 )
 
-target_link_libraries(ECppS ${LUA53_LIBRARIES})
+target_link_libraries(ECppS ${LUA53_LIBRARIES} pthread)

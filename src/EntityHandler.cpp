@@ -21,26 +21,14 @@ EntityHandler::EntityHandler(EntityID id, EntityStorage* storage) :
 bool EntityHandler::hasComponent(const ComponentDef& def)
 {
     if(m_storage && m_ID != 0)
-    {
-        auto& components = getComponents();
-        return components.find(def) != std::end(components);
-    }
+        return m_storage->hasComponent(m_ID, def);
     return false;
 }
 
 Component& EntityHandler::addComponent(const ComponentDef& def)
 {
     if(m_storage && m_ID != 0)
-    {
-        auto& components = getComponents();
-        if(components.find(def) == std::end(components))
-        {
-            auto &component = components[def] = def.create();
-            return component;
-        }
-        else
-            throw std::runtime_error("Trying to add component which already exists");
-    }
+        return m_storage->createComponent(m_ID, def);
     throw std::runtime_error("Trying to add component to invalid entity");
 }
 
@@ -52,16 +40,7 @@ const EntityID& EntityHandler::id() const
 Component& EntityHandler::getComponent(const ComponentDef &def)
 {
     if(m_storage && m_ID != 0)
-    {
-        if(hasComponent(def))
-            return getComponents()[def];
-        throw std::runtime_error("Entity doesn't have " + def.name() + " component");
-    }
+        return m_storage->getComponent(m_ID, def);
     throw std::runtime_error("Trying to get component from invalid entity");
     
-}
-
-Components& EntityHandler::getComponents()
-{
-    return m_storage->getComponents(m_ID);
 }

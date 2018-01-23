@@ -5,8 +5,9 @@
 #include <EntityDef.hpp>
 #include <EntityStorage.hpp>
 #include <SystemDef.hpp>
-#include <System.hpp>
 #include <Context.hpp>
+#include <LinearStep/LinearStep.hpp>
+#include <ConcurrentStep/ConcurrentStep.hpp>
 
 namespace
 {
@@ -153,24 +154,32 @@ sol::table ECppS::createModule(sol::this_state L)
                                    "init", &SystemDef::init,
                                    "read", &SystemDef::read,
                                    "write", &SystemDef::write,
-                                   "depends", &SystemDef::depends
-    );
-    
-    module.new_usertype<System>("System",
-                                "new", sol::no_constructor
-                                //"addDependency", &System::addDependency,
+                                   "depends", &SystemDef::depends,
+                                   "process", &SystemDef::process
     );
     
     module.new_usertype<Context>("Context",
                                  "new", sol::constructors<Context()>(),
+                                 "setStep", &Context::setStep,
                                  "addSystem", &Context::addSystem,
                                  "removeSystem", &Context::removeSystem,
-                                 "getSystem", &Context::getSystem
+                                 "getSystem", &Context::getSystem,
+                                 "step", &Context::step
     );
     
     module.new_usertype<Step>("Step",
                               "new", sol::no_constructor,
                               "process", &Step::process
+    );
+    
+    module.new_usertype<LinearStep>("LinearStep",
+                                    "process", &LinearStep::process,
+                                    sol::base_classes, sol::bases<Step>()
+    );
+    
+    module.new_usertype<ConcurrentStep>("ConcurrentStep",
+                                        "process", &ConcurrentStep::process,
+                                        sol::base_classes, sol::bases<Step>()
     );
     return module;
 }

@@ -8,7 +8,7 @@
 class LinearStep : public Step
 {
 public:
-    LinearStep() = default;
+    LinearStep();
     virtual ~LinearStep() = default;
     virtual void run(Context&) override;
 };
