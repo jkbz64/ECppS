@@ -3,7 +3,7 @@
 
 ConcurrentStep::ConcurrentStep() :
     Step(new ConcurrentQueue()),
-    m_pool(1, std::dynamic_pointer_cast<ConcurrentQueue>(m_queue))
+    m_pool(std::thread::hardware_concurrency(), std::dynamic_pointer_cast<ConcurrentQueue>(m_queue))
 {
 
 }
@@ -17,5 +17,5 @@ void ConcurrentStep::run(Context &context)
     while(concQueue->getPendingTasks().load(std::memory_order_acquire) > 0)
         continue;
     
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    
 }

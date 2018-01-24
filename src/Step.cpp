@@ -20,6 +20,7 @@ void Step::process(const SystemDef &def)
 {
     if(m_context->hasSystem(def))
     {
+        m_doneSystems[def].store(false);
         auto& system = m_context->getSystem(def);
         for(auto& dep : def.m_dependencies)
             process(dep);

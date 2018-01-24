@@ -15,7 +15,6 @@ void ConcurrentQueue::enqueue(Task task)
 {
     m_pendingTasks.fetch_add(1, std::memory_order_release);
     m_queue.enqueue(task);
-    
 }
 
 void ConcurrentQueue::waitDequeue(Task &task)

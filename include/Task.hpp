@@ -17,18 +17,21 @@ struct Task
     {
         m_function = [&system, dependencies = deps, args]
         {
+            auto& def = system.m_def;
             auto& doneSystems = dependencies.get();
-            if(doneSystems.find(system.m_def) != std::end(doneSystems))
+            if(doneSystems[def].load())
                 return true;
             
             for(auto& dependency : system.m_def.m_dependencies)
             {
-                if(doneSystems.find(dependency) == std::end(doneSystems))
+                if(!doneSystems[dependency].load())
                     return false;
             }
             
             system.process(args);
-            doneSystems[system.m_def].store(true);
+            bool expected = false;
+            while(doneSystems[system.m_def].compare_exchange_strong(expected, true))
+                continue;
             return true;
         };
     }

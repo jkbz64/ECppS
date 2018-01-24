@@ -1,5 +1,6 @@
 #include <System.hpp>
 #include <SystemDef.hpp>
+#include <iostream>
 
 System::System(const SystemDef& def) :
     m_def(def)
@@ -9,5 +10,5 @@ System::System(const SystemDef& def) :
 
 void System::process(sol::variadic_args args)
 {
-    m_def.m_process();
+    std::cout << m_def.id() << std::endl;
 }
