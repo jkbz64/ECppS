@@ -1,11 +1,44 @@
 #include <Step.hpp>
 #include <sol/variadic_args.hpp>
 #include <Context.hpp>
-#include <Task.hpp>
 
 namespace
 {
-
+    void addNextSystem(SystemChain& chain, const SystemDef& root)
+    {
+        bool allDeps = true;
+        for(const auto& dep : root.dependencies())
+        {
+            if(std::find_if(chain.begin(), chain.end(), [&dep](const SystemDef& def)
+            {
+                return def.id() == dep.id();
+            }) == std::end(chain))
+            {
+                allDeps = false;
+                break;
+            }
+        }
+        if(!allDeps)
+        {
+            for(const auto& dep : root.dependencies())
+                addNextSystem(chain, dep);
+        }
+        else
+        {
+            if(std::find_if(chain.begin(), chain.end(), [&root](const SystemDef& def)
+            {
+                return def.id() == root.id();
+            }) == std::end(chain))
+                chain.emplace_back(root);
+        }
+    }
+    
+    void count(std::set<SystemDef, SystemDef::Less>& set, const SystemDef& root)
+    {
+        for(auto& dep : root.dependencies())
+            count(set, dep);
+        set.emplace(root);
+    }
 }
 
 Step::Step(AbstractQueue* queue) :
@@ -20,17 +53,13 @@ void Step::process(const SystemDef &def)
 {
     if(m_context->hasSystem(def))
     {
-        m_doneSystems[def].store(false);
-        auto& system = m_context->getSystem(def);
-        for(auto& dep : def.m_dependencies)
-            process(dep);
-    
-        m_tasks.emplace_back([doneSystems = std::reference_wrapper<DoneSystems>(m_doneSystems), this, &system]()
+        std::set<SystemDef, SystemDef::Less> countSet;
+        count(countSet, def);
+        std::size_t oldCount = m_chain.size();
+        while(m_chain.size() < countSet.size() + oldCount)
         {
-            m_queue->enqueue(Task(system, doneSystems, sol::variadic_args()));
-        });
+            addNextSystem(m_chain, def);
+        }
     }
-    else
-        throw std::runtime_error("Trying to process system which doesn't exist in context");
 }
 

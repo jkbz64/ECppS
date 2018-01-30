@@ -4,7 +4,7 @@
 #include <AbstractQueue.hpp>
 #include <concurrentqueue/blockingconcurrentqueue.h>
 #include <atomic>
-#include <Task.hpp>
+#include <System.hpp>
 
 class ConcurrentQueue : public AbstractQueue
 {

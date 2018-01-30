@@ -1,7 +1,7 @@
 #include <ConcurrentStep/ConcurrentQueue.hpp>
-#include <Task.hpp>
 
-ConcurrentQueue::ConcurrentQueue()
+ConcurrentQueue::ConcurrentQueue() :
+    m_pendingTasks(0)
 {
 
 }
@@ -13,7 +13,7 @@ ConcurrentQueue::~ConcurrentQueue()
 
 void ConcurrentQueue::enqueue(Task task)
 {
-    m_pendingTasks.fetch_add(1, std::memory_order_release);
+    m_pendingTasks.fetch_add(1);
     m_queue.enqueue(task);
 }
 

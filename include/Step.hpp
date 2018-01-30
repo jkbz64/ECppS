@@ -7,7 +7,7 @@
 #include <SystemDef.hpp>
 #include <AbstractQueue.hpp>
 
-using DoneSystems = std::map<SystemDef, std::atomic<bool>, SystemDef::Less>;
+using SystemChain = std::vector<SystemDef>;
 
 class Step
 {
@@ -19,9 +19,8 @@ public:
 protected:
     friend class Context;
     Context* m_context{nullptr};
+    SystemChain m_chain;
     std::shared_ptr<AbstractQueue> m_queue;
-    std::vector<std::function<void()>> m_tasks;
-    DoneSystems m_doneSystems;
 };
 
 #endif //ECPPS_STEP_HPP

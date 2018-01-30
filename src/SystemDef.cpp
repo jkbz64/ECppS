@@ -43,6 +43,11 @@ SystemDef& SystemDef::process(sol::function f)
     return *this;
 }
 
+const SystemDef::Dependencies& SystemDef::dependencies() const
+{
+    return m_dependencies;
+}
+
 std::size_t SystemDef::Hasher::operator()(const SystemDef &def) const
 {
     return def.m_ID;

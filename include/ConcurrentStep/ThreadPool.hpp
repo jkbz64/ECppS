@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <vector>
-#include <Task.hpp>
 #include <concurrentqueue/blockingconcurrentqueue.h>
 #include <ConcurrentStep/ConcurrentQueue.hpp>
 

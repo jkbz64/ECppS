@@ -5,6 +5,7 @@
 #include <sol/function.hpp>
 #include <fwd.hpp>
 
+
 class SystemDef
 {
 public:
@@ -23,10 +24,13 @@ public:
         bool operator()(const SystemDef&, const SystemDef&) const noexcept;
     };
     
+    using Dependencies = std::set<SystemDef, SystemDef::Less>;
+    
     SystemDef();
     ~SystemDef() = default;
     
     const std::size_t& id() const;
+    const Dependencies& dependencies() const;
     
     SystemDef& init(sol::function);
     SystemDef& read(const ComponentDef&);
@@ -36,12 +40,11 @@ public:
 private:
     friend class Context;
     friend class Step;
-    friend class Task;
     friend class System;
     std::size_t m_ID;
     std::function<void(System&, sol::variadic_args)> m_init;
     std::function<void()> m_process;
-    std::set<SystemDef, SystemDef::Less> m_dependencies;
+    Dependencies m_dependencies;
     
     std::set<std::size_t> m_reads;
     std::set<std::size_t> m_writes;

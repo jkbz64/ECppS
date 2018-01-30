@@ -9,9 +9,10 @@ class System
 public:
     System(const SystemDef&);
     
-    void process(sol::variadic_args);
+    void process();
+    
+    const SystemDef& def() const;
 private:
-    friend class Task;
     sol::table m_properties;
     sol::function m_process;
     const SystemDef& m_def;

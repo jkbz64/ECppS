@@ -1,6 +1,7 @@
 #include <Context.hpp>
 #include <ConcurrentStep/ConcurrentStep.hpp>
 #include <LinearStep/LinearStep.hpp>
+#include <iostream>
 
 Context::Context() :
         m_systems(),

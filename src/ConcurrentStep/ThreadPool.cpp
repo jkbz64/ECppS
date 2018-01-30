@@ -20,7 +20,7 @@ ThreadPool::~ThreadPool()
         worker->stop();
     
     while(!allFinished())
-        m_queue->enqueue(Task());
+        m_queue->enqueue([](){});
     
     for(auto &worker : m_workers)
         worker->m_thread.join();

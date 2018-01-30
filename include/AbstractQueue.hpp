@@ -1,7 +1,8 @@
 #ifndef ECPPS_ABSTRACTQUEUE_HPP
 #define ECPPS_ABSTRACTQUEUE_HPP
+#include <functional>
 
-class Task;
+using Task = std::function<void()>;
 
 class AbstractQueue
 {

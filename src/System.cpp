@@ -8,7 +8,12 @@ System::System(const SystemDef& def) :
 
 }
 
-void System::process(sol::variadic_args args)
+void System::process()
 {
     std::cout << m_def.id() << std::endl;
+}
+
+const SystemDef &System::def() const
+{
+    return m_def;
 }

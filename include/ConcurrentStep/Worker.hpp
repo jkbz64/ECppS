@@ -2,7 +2,6 @@
 #define ECPPS_WORKER_HPP
 
 #include <concurrentqueue/blockingconcurrentqueue.h>
-#include <Task.hpp>
 
 class ConcurrentQueue;
 

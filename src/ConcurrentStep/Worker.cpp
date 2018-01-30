@@ -31,13 +31,8 @@ void Worker::run()
     while(m_state == State::running)
     {
         m_queue->waitDequeue(task);
-        if(task.m_function())
-            pendingTasks.fetch_add(-1, std::memory_order_release);
-        else
-        {
-            m_queue->enqueue(task);
-            pendingTasks.fetch_add(-1, std::memory_order_release);
-        }
+        task();
+        pendingTasks.fetch_add(-1);
     }
     m_state = State::finished;
 }
