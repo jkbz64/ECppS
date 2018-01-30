@@ -13,7 +13,7 @@ ConcurrentQueue::~ConcurrentQueue()
 
 void ConcurrentQueue::enqueue(Task task)
 {
-    m_pendingTasks.fetch_add(1);
+    m_pendingTasks.fetch_add(1, std::memory_order_release);
     m_queue.enqueue(task);
 }
 

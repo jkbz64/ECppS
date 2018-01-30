@@ -10,7 +10,7 @@ System::System(const SystemDef& def) :
 
 void System::process()
 {
-    std::cout << m_def.id() << std::endl;
+    //std::cout << m_def.id() << std::endl;
 }
 
 const SystemDef &System::def() const

@@ -32,7 +32,7 @@ void Worker::run()
     {
         m_queue->waitDequeue(task);
         task();
-        pendingTasks.fetch_add(-1);
+        pendingTasks.fetch_add(-1, std::memory_order_release);
     }
     m_state = State::finished;
 }

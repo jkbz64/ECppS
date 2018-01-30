@@ -8,6 +8,7 @@
 #include <Context.hpp>
 #include <LinearStep/LinearStep.hpp>
 #include <ConcurrentStep/ConcurrentStep.hpp>
+#include <iostream>
 
 namespace
 {
@@ -181,6 +182,16 @@ sol::table ECppS::createModule(sol::this_state L)
                                         "process", &ConcurrentStep::process,
                                         sol::base_classes, sol::bases<Step>()
     );
+    
+    module.set_function("GetTime", [](sol::function f)
+    {
+        auto start = std::chrono::steady_clock::now();
+        f.call();
+        auto finish = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = finish - start;
+        std::cout << elapsed.count();
+    });
+    
     return module;
 }
 

@@ -45,15 +45,6 @@ bool Context::hasSystem(const SystemDef &def)
     return m_systems.find(def) != std::end(m_systems);
 }
 
-/*
- * context:step(function(step)
- *      step:process(MovementSystem, dt)
- *      step:process(function() window:clear(255, 255, 255, 255) end)
- *      step:
- * end)
- */
-
-
 void Context::step(sol::function f)
 {
     f.call(m_step.get());

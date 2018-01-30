@@ -11,7 +11,7 @@ ThreadPool::ThreadPool(std::size_t n, std::shared_ptr<ConcurrentQueue> queue) :
     }
     
     //TODO remove
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 ThreadPool::~ThreadPool()

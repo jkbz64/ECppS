@@ -1,6 +1,7 @@
 #include <ConcurrentStep/ConcurrentStep.hpp>
 #include <ConcurrentStep/ConcurrentQueue.hpp>
 #include <Context.hpp>
+#include <iostream>
 
 ConcurrentStep::ConcurrentStep() :
     Step(new ConcurrentQueue()),
@@ -15,8 +16,10 @@ void ConcurrentStep::run(Context &context)
     auto concQueue = dynamic_cast<ConcurrentQueue*>(m_queue.get());
     
     for(auto& system : m_chain)
+        doneSystems[system].store(false, std::memory_order_release);
+    
+    for(auto& system : m_chain)
     {
-        doneSystems[system].store(false);
         concQueue->enqueue([&doneSystems, &system = m_context->getSystem(system)]()
         {
             const auto& dependencies = system.def().dependencies();
@@ -28,17 +31,19 @@ void ConcurrentStep::run(Context &context)
                    
                    for(const auto& dependency : dependencies)
                    {
-                       if(!doneSystems[dependency].load())
+                       if(!doneSystems[dependency].load(std::memory_order_relaxed))
                          goto retry;
                    }
                    break;
                }
             }
             system.process();
-            doneSystems[system.def()].store(true);
+            doneSystems[system.def()].store(true, std::memory_order_release);
         });
     }
     
-    while(concQueue->getPendingTasks().load() > 0)
+    while(concQueue->getPendingTasks().load(std::memory_order_acquire) > 0)
         continue;
+    
+    m_chain.clear();
 }
