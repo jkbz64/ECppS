@@ -52,7 +52,7 @@ Component& EntityStorage::createComponent(EntityID id, const ComponentDef &def)
     auto& components = m_components[def];
     auto where = components.find(id);
     if(where == std::end(components))
-        where = components.emplace(id, def.create()).first;
+        where = components.emplace(id, def).first;
     return (*where).second;
 }
 

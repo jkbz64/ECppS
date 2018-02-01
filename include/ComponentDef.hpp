@@ -31,10 +31,9 @@ public:
     ComponentDef& var_f(const std::string&, sol::function, sol::variadic_args);
     ComponentDef& done(sol::this_state);
     ComponentDef& done(sol::this_state, sol::function f);
-    
-    Component create() const;
 private:
     friend class ECppS;
+    friend class Component;
     sol::this_state m_lua;
     std::string m_name;
     std::size_t m_ID;

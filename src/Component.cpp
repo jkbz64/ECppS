@@ -1,4 +1,13 @@
 #include <Component.hpp>
+#include <ComponentDef.hpp>
+
+Component::Component(const ComponentDef& def)
+{
+    for(const auto &var : def.m_variables)
+        var(m_data);
+    m_valid = true;
+    def.m_done(*this, sol::variadic_args(def.m_lua));
+}
 
 sol::object Component::getVariable(const std::string& name)
 {

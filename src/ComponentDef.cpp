@@ -111,22 +111,6 @@ ComponentDef& ComponentDef::done(sol::this_state L, sol::function f)
     return *this;
 }
 
-Component ComponentDef::create() const
-{
-    if(m_lua && m_done)
-    {
-        Component component(m_name);
-        for(const auto &def : m_variables)
-            def(component.m_data);
-        component.m_valid = true;
-        
-        if(m_done)
-            m_done(component, sol::variadic_args(m_lua));
-        return component;
-    }
-    return Component();
-}
-
 const std::size_t& ComponentDef::id() const
 {
     return m_ID;

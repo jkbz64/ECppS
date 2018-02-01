@@ -2,9 +2,8 @@
 #define ECPPS_SYSTEMDEF_HPP
 
 #include <cstddef>
-#include <sol/function.hpp>
+#include <functional>
 #include <fwd.hpp>
-
 
 class SystemDef
 {

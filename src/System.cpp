@@ -1,6 +1,6 @@
 #include <System.hpp>
 #include <SystemDef.hpp>
-#include <iostream>
+#include <thread>
 
 System::System(const SystemDef& def) :
     m_def(def)
@@ -10,7 +10,7 @@ System::System(const SystemDef& def) :
 
 void System::process()
 {
-    //std::cout << m_def.id() << std::endl;
+
 }
 
 const SystemDef &System::def() const

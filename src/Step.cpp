@@ -1,9 +1,11 @@
 #include <Step.hpp>
 #include <sol/variadic_args.hpp>
 #include <Context.hpp>
+#include <iostream>
 
 namespace
 {
+    static std::unordered_map<SystemDef, std::vector<SystemDef>, SystemDef::Hasher, SystemDef::Comparator> cachedChains;
     void addNextSystem(SystemChain& chain, const SystemDef& root)
     {
         bool allDeps = true;
@@ -47,18 +49,38 @@ Step::Step(AbstractQueue* queue) :
 
 }
 
-Step::~Step() = default;
+Step::~Step()
+{
+    cachedChains.clear();
+}
 
 void Step::process(const SystemDef &def)
 {
     if(m_context->hasSystem(def))
     {
-        std::set<SystemDef, SystemDef::Less> countSet;
-        count(countSet, def);
-        std::size_t oldCount = m_chain.size();
-        while(m_chain.size() < countSet.size() + oldCount)
+        if(cachedChains.find(def) == std::end(cachedChains))
         {
-            addNextSystem(m_chain, def);
+            std::set<SystemDef, SystemDef::Less> countSet;
+            count(countSet, def);
+            std::size_t oldCount = m_chain.size();
+            while(m_chain.size() < countSet.size() + oldCount)
+            {
+                addNextSystem(m_chain, def);
+            }
+            std::vector<SystemDef> defChain = {};
+            for(auto i = oldCount; i < m_chain.size() - 1; ++i)
+            {
+                std::cerr << m_chain[i].id() << " ";
+                defChain.emplace_back(m_chain[i]);
+            }
+            cachedChains.emplace(def, std::move(defChain));
+        }
+        else
+        {
+            for(const auto& chainElement : cachedChains[def])
+            {
+                m_chain.emplace_back(chainElement);
+            }
         }
     }
 }

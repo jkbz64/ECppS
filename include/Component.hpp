@@ -3,13 +3,15 @@
 
 #include <unordered_map>
 #include <sol/state_view.hpp>
+#include <mutex>
 
 using ComponentData = std::unordered_map<std::string, sol::object>;
+class ComponentDef;
 
 class Component
 {
 public:
-    Component() = default;
+    Component(const ComponentDef&);
     Component(std::string name) : m_name(std::move(name)) { }
     ~Component() = default;
     

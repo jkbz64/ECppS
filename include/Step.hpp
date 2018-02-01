@@ -6,6 +6,7 @@
 #include <atomic>
 #include <SystemDef.hpp>
 #include <AbstractQueue.hpp>
+#include <memory>
 
 using SystemChain = std::vector<SystemDef>;
 
