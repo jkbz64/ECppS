@@ -4,18 +4,19 @@
 ThreadPool::ThreadPool(std::size_t n, std::shared_ptr<ConcurrentQueue> queue) :
     m_queue(queue)
 {
+    m_unitinializedCount = n;
     for(auto i = 0u; i < n; ++i)
     {
         m_workers.emplace_back(std::move(std::make_unique<Worker>(queue)));
-        m_workers[i]->start();
+        m_workers[i]->start(m_unitinializedCount);
     }
-    
-    //TODO remove
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 ThreadPool::~ThreadPool()
 {
+    while(m_unitinializedCount.load() > 0)
+        continue;
+    
     for(auto &worker : m_workers)
         worker->stop();
     
@@ -23,8 +24,7 @@ ThreadPool::~ThreadPool()
         m_queue->enqueue([](){});
     
     for(auto &worker : m_workers)
-        worker->m_thread.join();
-    
+        worker->join();
 }
 
 bool ThreadPool::allFinished()

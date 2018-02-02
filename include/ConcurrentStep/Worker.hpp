@@ -18,8 +18,9 @@ public:
     Worker(std::shared_ptr<ConcurrentQueue>);
     ~Worker();
     
-    void start();
+    void start(std::atomic<std::size_t>&);
     void stop();
+    void join();
 private:
     void run();
     friend class ThreadPool;

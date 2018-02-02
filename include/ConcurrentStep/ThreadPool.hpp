@@ -18,6 +18,7 @@ public:
 private:
     std::vector <std::unique_ptr<Worker>> m_workers;
     std::shared_ptr<ConcurrentQueue> m_queue;
+    std::atomic<std::size_t> m_unitinializedCount;
 };
 
 #endif //ECPPS_THREADPOOL_HPP

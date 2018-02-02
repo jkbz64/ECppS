@@ -10,10 +10,11 @@ Worker::Worker(std::shared_ptr<ConcurrentQueue> queue) :
 
 Worker::~Worker() = default;
 
-void Worker::start()
+void Worker::start(std::atomic<std::size_t>& uninitializedCount)
 {
-    m_thread = std::thread([this]{
+    m_thread = std::thread([this, &uninitializedCount]{
         m_state = State::running;
+        --uninitializedCount;
         run();
     });
 }
@@ -35,4 +36,9 @@ void Worker::run()
         pendingTasks.fetch_add(-1, std::memory_order_release);
     }
     m_state = State::finished;
+}
+
+void Worker::join()
+{
+    m_thread.join();
 }
