@@ -1,7 +1,6 @@
 #include <EntityStorage.hpp>
 #include <EntityDef.hpp>
 #include <ComponentDef.hpp>
-#include <iostream>
 
 EntityHandler EntityStorage::createEntity()
 {

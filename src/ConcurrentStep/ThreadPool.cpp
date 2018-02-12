@@ -1,7 +1,7 @@
 #include <ConcurrentStep/ThreadPool.hpp>
 #include <ConcurrentStep/Worker.hpp>
 
-ThreadPool::ThreadPool(std::size_t n, std::shared_ptr<ConcurrentQueue> queue) :
+ThreadPool::ThreadPool(sol::this_state L, std::size_t n, ConcurrentQueue& queue) :
     m_queue(queue)
 {
     m_unitinializedCount = n;
@@ -21,7 +21,7 @@ ThreadPool::~ThreadPool()
         worker->stop();
     
     while(!allFinished())
-        m_queue->enqueue([](){});
+        m_queue.enqueue([](Worker&){});
     
     for(auto &worker : m_workers)
         worker->join();

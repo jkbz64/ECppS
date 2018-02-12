@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include <fwd.hpp>
+#include <sol/function.hpp>
 
 class SystemDef
 {
@@ -40,9 +41,10 @@ private:
     friend class Context;
     friend class Step;
     friend class System;
+    friend class ConcurrentStep;
     std::size_t m_ID;
     std::function<void(System&, sol::variadic_args)> m_init;
-    std::function<void()> m_process;
+    sol::function m_process;
     Dependencies m_dependencies;
     
     std::set<std::size_t> m_reads;

@@ -2,6 +2,9 @@
 #define ECPPS_WORKER_HPP
 
 #include <concurrentqueue/blockingconcurrentqueue.h>
+#include <sol/state.hpp>
+#include <list>
+#include <ConcurrentStep/ConcurrentQueue.hpp>
 
 class ConcurrentQueue;
 
@@ -15,7 +18,7 @@ public:
         stopped,
         finished
     };
-    Worker(std::shared_ptr<ConcurrentQueue>);
+    Worker(ConcurrentQueue&);
     ~Worker();
     
     void start(std::atomic<std::size_t>&);
@@ -24,8 +27,9 @@ public:
 private:
     void run();
     friend class ThreadPool;
+    friend class ConcurrentStep;
     std::thread m_thread;
-    std::shared_ptr<ConcurrentQueue> m_queue;
+    ConcurrentQueue& m_queue;
     std::atomic<State> m_state{State::unitinialized};
 };
 

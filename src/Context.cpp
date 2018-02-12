@@ -1,13 +1,12 @@
 #include <Context.hpp>
 #include <ConcurrentStep/ConcurrentStep.hpp>
 #include <LinearStep/LinearStep.hpp>
-#include <iostream>
 
 Context::Context() :
         m_systems(),
-        m_step(new ConcurrentStep())
+        m_step(nullptr)
 {
-    m_step->m_context = this;
+
 }
 
 Context::~Context() = default;
@@ -51,9 +50,9 @@ void Context::step(sol::function f)
     m_step->run(*this);
 }
 
-void Context::setStep(Step *step)
+void Context::setStep(std::unique_ptr<Step>& step)
 {
-    m_step.reset(step);
+    m_step = std::move(step);
     m_step->m_context = this;
 }
 

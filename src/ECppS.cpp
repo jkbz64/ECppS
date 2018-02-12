@@ -162,6 +162,16 @@ sol::table ECppS::createModule(sol::this_state L)
     module.new_usertype<Context>("Context",
                                  "new", sol::constructors<Context()>(),
                                  "setStep", &Context::setStep,
+                                 "setLinearStep", [](Context& context)
+                                 {
+                                     std::unique_ptr<Step> step = std::make_unique<LinearStep>();
+                                     context.setStep(step);
+                                 },
+                                 "setConcurrentStep", [](sol::this_state L, Context& context)
+                                 {
+                                     std::unique_ptr<Step> step = std::make_unique<ConcurrentStep>(L);
+                                     context.setStep(step);
+                                 },
                                  "addSystem", &Context::addSystem,
                                  "removeSystem", &Context::removeSystem,
                                  "getSystem", &Context::getSystem,
@@ -185,11 +195,11 @@ sol::table ECppS::createModule(sol::this_state L)
     
     module.set_function("GetTime", [](sol::function f)
     {
-        auto start = std::chrono::steady_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         f.call();
-        auto finish = std::chrono::steady_clock::now();
+        auto finish = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = finish - start;
-        std::cout << elapsed.count();
+        std::cout << elapsed.count() << '\n';
     });
     
     return module;

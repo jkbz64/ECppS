@@ -2,7 +2,7 @@
 #include <ConcurrentStep/ConcurrentQueue.hpp>
 #include <iostream>
 
-Worker::Worker(std::shared_ptr<ConcurrentQueue> queue) :
+Worker::Worker(ConcurrentQueue& queue) :
     m_queue(queue)
 {
 
@@ -27,12 +27,11 @@ void Worker::stop()
 void Worker::run()
 {
     Task task;
-    //Probably always running
-    auto& pendingTasks = m_queue->getPendingTasks();
+    auto& pendingTasks = m_queue.m_pendingTasks;
     while(m_state == State::running)
     {
-        m_queue->waitDequeue(task);
-        task();
+        m_queue.wait_dequeue(task);
+        task(*this);
         pendingTasks.fetch_add(-1, std::memory_order_release);
     }
     m_state = State::finished;

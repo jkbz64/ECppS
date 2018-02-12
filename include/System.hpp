@@ -8,11 +8,10 @@ class System
 {
 public:
     System(const SystemDef&);
-    
-    void process();
-    
     const SystemDef& def() const;
 private:
+    friend class ConcurrentStep;
+    friend class LinearStep;
     sol::table m_properties;
     sol::function m_process;
     const SystemDef& m_def;

@@ -1,11 +1,10 @@
 #include <Step.hpp>
 #include <sol/variadic_args.hpp>
 #include <Context.hpp>
-#include <iostream>
 
 namespace
 {
-    static std::unordered_map<SystemDef, std::vector<SystemDef>, SystemDef::Hasher, SystemDef::Comparator> cachedChains;
+    std::unordered_map<SystemDef, std::vector<SystemDef>, SystemDef::Hasher, SystemDef::Comparator> cachedChains;
     void addNextSystem(SystemChain& chain, const SystemDef& root)
     {
         bool allDeps = true;
@@ -43,8 +42,7 @@ namespace
     }
 }
 
-Step::Step(AbstractQueue* queue) :
-    m_queue(queue)
+Step::Step()
 {
 
 }
@@ -69,18 +67,14 @@ void Step::process(const SystemDef &def)
             }
             std::vector<SystemDef> defChain = {};
             for(auto i = oldCount; i < m_chain.size() - 1; ++i)
-            {
-                std::cerr << m_chain[i].id() << " ";
                 defChain.emplace_back(m_chain[i]);
-            }
             cachedChains.emplace(def, std::move(defChain));
         }
         else
         {
             for(const auto& chainElement : cachedChains[def])
-            {
                 m_chain.emplace_back(chainElement);
-            }
+            m_chain.emplace_back(def);
         }
     }
 }

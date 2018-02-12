@@ -1,9 +1,7 @@
 #include <LinearStep/LinearStep.hpp>
 #include <Context.hpp>
-#include <iostream>
 
-LinearStep::LinearStep() :
-    Step(nullptr) /////////// TODO
+LinearStep::LinearStep()
 {
 
 }
@@ -11,9 +9,7 @@ LinearStep::LinearStep() :
 void LinearStep::run(Context& context)
 {
     for(auto& system : m_chain)
-    {
-        m_context->getSystem(system).process();
-    }
+        m_context->getSystem(system).m_process.call();
     m_chain.clear();
 }
 

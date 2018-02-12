@@ -17,7 +17,7 @@ public:
     System& getSystem(const SystemDef&);
     bool hasSystem(const SystemDef&);
     
-    void setStep(Step*);
+    void setStep(std::unique_ptr<Step>&);
     
     void step(sol::function);
 private:

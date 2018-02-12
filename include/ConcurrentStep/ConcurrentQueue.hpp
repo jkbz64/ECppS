@@ -1,24 +1,17 @@
 #ifndef ECPPS_CONCURRENTQUEUE_HPP
 #define ECPPS_CONCURRENTQUEUE_HPP
 
-#include <AbstractQueue.hpp>
 #include <concurrentqueue/blockingconcurrentqueue.h>
 #include <atomic>
-#include <System.hpp>
 
-class ConcurrentQueue : public AbstractQueue
+class Worker;
+
+using Task = std::function<void(Worker&)>;
+
+struct ConcurrentQueue : public moodycamel::BlockingConcurrentQueue<Task>
 {
 public:
-    ConcurrentQueue();
-    virtual ~ConcurrentQueue();
-    
-    virtual void enqueue(Task) override;
-    virtual void waitDequeue(Task&) override;
-    
-    std::atomic<int>& getPendingTasks();
-protected:
-    moodycamel::BlockingConcurrentQueue<Task> m_queue;
-    std::atomic<int> m_pendingTasks;
+    std::atomic<int> m_pendingTasks{0};
 };
 
 #endif //ECPPS_CONCURRENTQUEUE_HPP

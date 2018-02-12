@@ -17,6 +17,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
+set(CMAKE_STATIC_LIBRARY_PREFIX "")
 
 file(GLOB_RECURSE HDRS include/*.hpp)
 file(GLOB_RECURSE SRCS src/*.cpp)

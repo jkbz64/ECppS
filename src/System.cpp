@@ -5,12 +5,7 @@
 System::System(const SystemDef& def) :
     m_def(def)
 {
-
-}
-
-void System::process()
-{
-
+    m_process = def.m_process;
 }
 
 const SystemDef &System::def() const
