@@ -5,6 +5,7 @@
 #include <ConcurrentStep/ThreadPool.hpp>
 #include <sol/state_view.hpp>
 #include <sol/thread.hpp>
+#include <list>
 
 using DoneSystems = std::unordered_map<SystemDef, std::atomic<bool>, SystemDef::Hasher, SystemDef::Comparator>;
 using CachedTasks = std::unordered_map<SystemDef, std::vector<Task>, SystemDef::Hasher, SystemDef::Comparator>;
@@ -19,10 +20,12 @@ protected:
     void rebuildTasks();
     sol::this_state L;
     ConcurrentQueue m_queue;
-    ThreadPool m_pool;
-    std::vector<sol::thread> m_stacks;
+    std::array<sol::thread, 100> m_stacks;
+    std::list<sol::function> m_refHolder;
+    std::size_t m_nextStack{0};
     DoneSystems m_doneSystems;
     CachedTasks m_cachedTasks;
+    ThreadPool m_pool;
 };
 
 #endif //ECPPS_CONCURRENTSTEP_HPP

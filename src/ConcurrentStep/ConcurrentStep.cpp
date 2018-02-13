@@ -7,10 +7,11 @@
 
 ConcurrentStep::ConcurrentStep(sol::this_state l) :
         L(l),
+        m_queue(),
         m_pool(l, std::thread::hardware_concurrency(), m_queue)
 {
-    for(auto i = 0u; i < std::thread::hardware_concurrency() * 2; ++i)
-        m_stacks.emplace_back(sol::thread::create(L));
+    for(auto& stack : m_stacks)
+        stack = sol::thread::create(L);
 }
 
 /*void ConcurrentStep::run(Context &context)
@@ -55,7 +56,7 @@ void ConcurrentStep::process(const SystemDef &def)
     
     auto& tasksChain = m_cachedTasks[def];
     
-    m_queue.m_pendingTasks.fetch_add(tasksChain.size(), std::memory_order_relaxed);
+    m_queue.m_pendingTasks.fetch_add(tasksChain.size(), std::memory_order_release);
     m_queue.enqueue_bulk(tasksChain.begin(), tasksChain.size());
     
     while(m_queue.m_pendingTasks.load(std::memory_order_acquire) > 0)
@@ -64,6 +65,8 @@ void ConcurrentStep::process(const SystemDef &def)
 
 void ConcurrentStep::rebuildTasks()
 {
+    m_refHolder.clear();
+    m_nextStack = 0;
     m_cachedTasks.clear();
     for(auto& cachedChain : m_cachedChains)
     {
@@ -72,13 +75,17 @@ void ConcurrentStep::rebuildTasks()
         for(const auto& system : systems)
         {
             m_doneSystems.emplace(system, false);
-            tasks.emplace_back([this, system]()
+            auto& currentStack = m_stacks[m_nextStack++];
+            sol::function moved = sol::function(currentStack.thread_state(), system.m_process);
+            m_refHolder.push_back(moved);
+            tasks.emplace_back([this, &system, &moved = m_refHolder.back()]()
                                {
                                    for(const auto& dependency : system.dependencies())
                                    {
                                        while(!m_doneSystems[dependency].load(std::memory_order_acquire))
                                            continue;
                                    }
+                                   moved.call();
                                    m_doneSystems[system].store(true, std::memory_order_release);
                                });
         }
