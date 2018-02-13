@@ -6,7 +6,7 @@
 
 class Worker;
 
-using Task = std::function<void(Worker&)>;
+using Task = std::function<void()>;
 
 struct ConcurrentQueue : public moodycamel::BlockingConcurrentQueue<Task>
 {

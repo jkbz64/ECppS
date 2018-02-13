@@ -10,7 +10,7 @@ class LinearStep : public Step
 public:
     LinearStep();
     virtual ~LinearStep() = default;
-    virtual void run(Context&) override;
+    virtual void process(const SystemDef&) override;
 };
 
 #endif //ECPPS_LINEARSTEP_HPP

@@ -21,7 +21,7 @@ ThreadPool::~ThreadPool()
         worker->stop();
     
     while(!allFinished())
-        m_queue.enqueue([](Worker&){});
+        m_queue.enqueue([](){});
     
     for(auto &worker : m_workers)
         worker->join();

@@ -8,18 +8,19 @@
 #include <memory>
 
 using SystemChain = std::vector<SystemDef>;
+using CachedChains = std::unordered_map<SystemDef, SystemChain, SystemDef::Hasher, SystemDef::Comparator>;
 
 class Step
 {
 public:
     Step();
     virtual ~Step();
-    virtual void run(Context&) = 0;
-    void process(const SystemDef&);
+    virtual void process(const SystemDef&) = 0;
 protected:
+    bool updateCache(const SystemDef&);
     friend class Context;
     Context* m_context{nullptr};
-    SystemChain m_chain;
+    CachedChains m_cachedChains;
 };
 
 #endif //ECPPS_STEP_HPP

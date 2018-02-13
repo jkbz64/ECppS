@@ -47,7 +47,6 @@ bool Context::hasSystem(const SystemDef &def)
 void Context::step(sol::function f)
 {
     f.call(m_step.get());
-    m_step->run(*this);
 }
 
 void Context::setStep(std::unique_ptr<Step>& step)

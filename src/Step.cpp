@@ -1,81 +1,58 @@
 #include <Step.hpp>
 #include <sol/variadic_args.hpp>
 #include <Context.hpp>
+#include <iostream>
 
 namespace
 {
-    std::unordered_map<SystemDef, std::vector<SystemDef>, SystemDef::Hasher, SystemDef::Comparator> cachedChains;
-    void addNextSystem(SystemChain& chain, const SystemDef& root)
+    using VisitedDefs = std::map<SystemDef, bool, SystemDef::Less>;
+    
+    void topologicSort(const SystemDef& def, VisitedDefs& visited, SystemChain& chain)
     {
-        bool allDeps = true;
-        for(const auto& dep : root.dependencies())
+        visited[def] = true;
+        
+        for(const auto& adj : def.dependencies())
         {
-            if(std::find_if(chain.begin(), chain.end(), [&dep](const SystemDef& def)
-            {
-                return def.id() == dep.id();
-            }) == std::end(chain))
-            {
-                allDeps = false;
-                break;
-            }
+            if(!visited[adj])
+                topologicSort(adj, visited, chain);
         }
-        if(!allDeps)
-        {
-            for(const auto& dep : root.dependencies())
-                addNextSystem(chain, dep);
-        }
-        else
-        {
-            if(std::find_if(chain.begin(), chain.end(), [&root](const SystemDef& def)
-            {
-                return def.id() == root.id();
-            }) == std::end(chain))
-                chain.emplace_back(root);
-        }
+        chain.emplace_back(def);
     }
     
-    void count(std::set<SystemDef, SystemDef::Less>& set, const SystemDef& root)
+    void count(VisitedDefs& visited, const SystemDef& root)
     {
         for(auto& dep : root.dependencies())
-            count(set, dep);
-        set.emplace(root);
+            count(visited, dep);
+        visited.emplace(root, false);
     }
 }
 
-Step::Step()
-{
+Step::Step() = default;
+Step::~Step() = default;
 
-}
-
-Step::~Step()
-{
-    cachedChains.clear();
-}
-
-void Step::process(const SystemDef &def)
+bool Step::updateCache(const SystemDef &def)
 {
     if(m_context->hasSystem(def))
     {
-        if(cachedChains.find(def) == std::end(cachedChains))
+        if(m_cachedChains.find(def) == std::end(m_cachedChains))
         {
-            std::set<SystemDef, SystemDef::Less> countSet;
-            count(countSet, def);
-            std::size_t oldCount = m_chain.size();
-            while(m_chain.size() < countSet.size() + oldCount)
+            //Stack
+            auto& cachedChain = m_cachedChains[def];
+            if(!cachedChain.empty())
+                cachedChain.clear();
+            
+            // Get number of vertices in graph
+            VisitedDefs visited;
+            count(visited, def);
+            
+            for(const auto& visitedPair : visited)
             {
-                addNextSystem(m_chain, def);
+                if(!visitedPair.second)
+                    topologicSort(visitedPair.first, visited, cachedChain);
             }
-            std::vector<SystemDef> defChain = {};
-            for(auto i = oldCount; i < m_chain.size() - 1; ++i)
-                defChain.emplace_back(m_chain[i]);
-            cachedChains.emplace(def, std::move(defChain));
-        }
-        else
-        {
-            for(const auto& chainElement : cachedChains[def])
-                m_chain.emplace_back(chainElement);
-            m_chain.emplace_back(def);
+            return true;
         }
     }
+    return false;
 }
 
