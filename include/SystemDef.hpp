@@ -41,6 +41,7 @@ private:
     friend class Context;
     friend class Step;
     friend class System;
+    friend class LinearStep;
     friend class ConcurrentStep;
     std::size_t m_ID;
     std::function<void(System&, sol::variadic_args)> m_init;

@@ -12,10 +12,9 @@ class Component
 {
 public:
     Component(const ComponentDef&);
-    Component(std::string name) : m_name(std::move(name)) { }
     ~Component() = default;
     
-    sol::object getVariable(const std::string&);
+    sol::object getVariable(sol::this_state, const std::string&);
     void setVariable(const std::string&, sol::object);
 private:
     bool m_valid{false};

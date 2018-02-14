@@ -9,7 +9,7 @@ Component::Component(const ComponentDef& def)
     def.m_done(*this, sol::variadic_args(def.m_lua));
 }
 
-sol::object Component::getVariable(const std::string& name)
+sol::object Component::getVariable(sol::this_state L, const std::string& name)
 {
     if(m_valid)
     {
@@ -19,7 +19,7 @@ sol::object Component::getVariable(const std::string& name)
             auto value = found->second;
             if(value.get_type() == sol::type::lightuserdata)
                 throw std::runtime_error("Error __index: Trying to index " + name + " which is nil in " + m_name);
-            return value;
+            return sol::object(L, value);
         }
         else
             throw std::runtime_error("Error __index: " + name + " doesn't exists in " + m_name);

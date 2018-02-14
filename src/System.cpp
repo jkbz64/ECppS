@@ -1,14 +1,7 @@
 #include <System.hpp>
-#include <SystemDef.hpp>
-#include <thread>
 
-System::System(const SystemDef& def) :
-    m_def(def)
+System::System(sol::this_state L, const SystemDef& def) :
+    m_main(L)
 {
-    m_process = def.m_process;
-}
-
-const SystemDef &System::def() const
-{
-    return m_def;
+    m_properties = sol::table::create(L.lua_state());
 }

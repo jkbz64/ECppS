@@ -26,13 +26,12 @@ void Worker::stop()
 
 void Worker::run()
 {
-    Task task;
     auto& pendingTasks = m_queue.m_pendingTasks;
     while(m_state == State::running)
     {
-        m_queue.wait_dequeue(task);
-        task();
-        pendingTasks.fetch_add(-1, std::memory_order_release);
+        m_queue.wait_dequeue(m_task);
+        m_task();
+        pendingTasks.fetch_sub(1u, std::memory_order_release);
     }
     m_state = State::finished;
 }

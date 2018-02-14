@@ -11,7 +11,7 @@ using Task = std::function<void()>;
 struct ConcurrentQueue : public moodycamel::BlockingConcurrentQueue<Task>
 {
 public:
-    std::atomic<int> m_pendingTasks{0};
+    std::atomic<std::size_t> m_pendingTasks{0u};
 };
 
 #endif //ECPPS_CONCURRENTQUEUE_HPP

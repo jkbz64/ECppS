@@ -151,6 +151,24 @@ sol::table ECppS::createModule(sol::this_state L)
                                        "getEntity", sol::sizeSetter(&EntityStorage::getEntity)
     );
     
+    module.new_usertype<System>("System",
+                                "new", sol::no_constructor,
+                                sol::meta_function::index, [](sol::this_state L, System& system, const std::string& name)
+                                {
+                                    if(L == system.m_main)
+                                        return system.m_properties[name];
+                                    else
+                                        return system.m_threadProperties[name];
+                                },
+                                sol::meta_function::new_index, [](sol::this_state L, System& system, const std::string& name, sol::stack_object object)
+                                {
+                                    if(L == system.m_main)
+                                        return system.m_properties[name] = object;
+                                    else
+                                        return system.m_threadProperties[name] = object;
+                                }
+    );
+    
     module.new_usertype<SystemDef>("SystemDef",
                                    "init", &SystemDef::init,
                                    "read", &SystemDef::read,
@@ -160,7 +178,7 @@ sol::table ECppS::createModule(sol::this_state L)
     );
     
     module.new_usertype<Context>("Context",
-                                 "new", sol::constructors<Context()>(),
+                                 "new", sol::constructors<Context(sol::this_state)>(),
                                  "setStep", &Context::setStep,
                                  "setLinearStep", [](Context& context)
                                  {

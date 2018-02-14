@@ -9,7 +9,7 @@
 class Context
 {
 public:
-    Context();
+    Context(sol::this_state);
     ~Context();
     
     void addSystem(const SystemDef&, sol::variadic_args);
@@ -21,6 +21,7 @@ public:
     
     void step(sol::function);
 private:
+    sol::this_state m_L;
     EntityStorage m_storage;
     std::unordered_map<SystemDef, System, SystemDef::Hasher, SystemDef::Comparator> m_systems;
     std::unique_ptr<Step> m_step;

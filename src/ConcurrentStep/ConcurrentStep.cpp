@@ -14,41 +14,6 @@ ConcurrentStep::ConcurrentStep(sol::this_state l) :
         stack = sol::thread::create(L);
 }
 
-/*void ConcurrentStep::run(Context &context)
-{
-    std::unordered_map<SystemDef, std::atomic<bool>, SystemDef::Hasher, SystemDef::Comparator> doneSystems;
-    
-    std::vector<Task> tasks;
-    std::list<sol::function> fcs;
-    
-    std::size_t tID = 0u;
-    for(auto& def : m_chain)
-    {
-        doneSystems.emplace(def, false);
-        fcs.emplace_back(m_stacks[tID].thread_state(), def.m_process);
-        tasks.emplace_back([&doneSystems, &system = context.getSystem(def), &moved = fcs.back()]()
-                           {
-                               for(const auto& dependency : system.def().dependencies())
-                               {
-                                   while(!doneSystems[dependency].load(std::memory_order_acquire))
-                                       continue;
-                               }
-                               moved.call();
-                               doneSystems[system.def()].store(true, std::memory_order_release);
-                           });
-        ++tID;
-        tID = tID % (std::thread::hardware_concurrency() * 2);
-    }
-    
-    m_queue.m_pendingTasks.fetch_add(tasks.size(), std::memory_order_relaxed);
-    m_queue.enqueue_bulk(tasks.begin(), tasks.size());
-    
-    while(m_queue.m_pendingTasks.load(std::memory_order_acquire) > 0)
-        continue;
-    
-    m_chain.clear();
-}*/
-
 void ConcurrentStep::process(const SystemDef &def)
 {
     if(updateCache(def))
@@ -59,34 +24,36 @@ void ConcurrentStep::process(const SystemDef &def)
     m_queue.m_pendingTasks.fetch_add(tasksChain.size(), std::memory_order_release);
     m_queue.enqueue_bulk(tasksChain.begin(), tasksChain.size());
     
-    while(m_queue.m_pendingTasks.load(std::memory_order_acquire) > 0)
+    while(m_queue.m_pendingTasks.load(std::memory_order_acquire) > 0u)
         continue;
 }
 
 void ConcurrentStep::rebuildTasks()
 {
+    m_nextStack = 0u;
     m_refHolder.clear();
-    m_nextStack = 0;
     m_cachedTasks.clear();
+    m_objs.clear();
     for(auto& cachedChain : m_cachedChains)
     {
         auto& tasks = m_cachedTasks[cachedChain.first];
         auto& systems = cachedChain.second;
-        for(const auto& system : systems)
+        for(auto& def : systems)
         {
-            m_doneSystems.emplace(system, false);
-            auto& currentStack = m_stacks[m_nextStack++];
-            sol::function moved = sol::function(currentStack.thread_state(), system.m_process);
-            m_refHolder.push_back(moved);
-            tasks.emplace_back([this, &system, &moved = m_refHolder.back()]()
+            m_doneSystems.emplace(def, false);
+            const auto& currentStack = m_stacks[m_nextStack++];
+            m_refHolder.emplace_back(currentStack.thread_state(), def.m_process);
+            m_objs.emplace_back(sol::make_reference(currentStack.thread_state(), std::ref(m_context->getSystem(def))));
+            m_context->getSystem(def).m_threadProperties = sol::table(currentStack.thread_state(), m_context->getSystem(def).m_properties);
+            tasks.emplace_back([this, &def, &process = m_refHolder.back(), &system = m_objs.back()]()
                                {
-                                   for(const auto& dependency : system.dependencies())
+                                   for(const auto& dependency : def.dependencies())
                                    {
                                        while(!m_doneSystems[dependency].load(std::memory_order_acquire))
                                            continue;
                                    }
-                                   moved.call();
-                                   m_doneSystems[system].store(true, std::memory_order_release);
+                                   process.call(system);
+                                   m_doneSystems[def].store(true, std::memory_order_release);
                                });
         }
     }

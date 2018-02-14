@@ -2,7 +2,9 @@
 #include <ConcurrentStep/ConcurrentStep.hpp>
 #include <LinearStep/LinearStep.hpp>
 
-Context::Context() :
+Context::Context(sol::this_state L) :
+        m_L(L),
+        m_storage(),
         m_systems(),
         m_step(nullptr)
 {
@@ -15,7 +17,7 @@ void Context::addSystem(const SystemDef &def, sol::variadic_args args)
 {
     if(m_systems.find(def) == std::end(m_systems))
     {
-        auto system = System(def);
+        auto system = System(m_L, def);
         def.m_init(system, args);
         m_systems.emplace(def, std::move(system));
     }

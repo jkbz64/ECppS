@@ -31,6 +31,7 @@ private:
     std::thread m_thread;
     ConcurrentQueue& m_queue;
     std::atomic<State> m_state{State::unitinialized};
+    Task m_task;
 };
 
 #endif //ECPPS_WORKER_HPP

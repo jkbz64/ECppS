@@ -1,11 +1,12 @@
 #ifndef ECPPS_STEP_HPP
 #define ECPPS_STEP_HPP
 
-#include <sol/forward.hpp>
 #include <fwd.hpp>
+#include <sol/forward.hpp>
 #include <atomic>
 #include <SystemDef.hpp>
 #include <memory>
+#include <sol/state.hpp>
 
 using SystemChain = std::vector<SystemDef>;
 using CachedChains = std::unordered_map<SystemDef, SystemChain, SystemDef::Hasher, SystemDef::Comparator>;

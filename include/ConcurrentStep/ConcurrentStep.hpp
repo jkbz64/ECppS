@@ -20,8 +20,9 @@ protected:
     void rebuildTasks();
     sol::this_state L;
     ConcurrentQueue m_queue;
-    std::array<sol::thread, 100> m_stacks;
     std::list<sol::function> m_refHolder;
+    std::list<sol::reference> m_objs;
+    std::array<sol::thread, 100> m_stacks;
     std::size_t m_nextStack{0};
     DoneSystems m_doneSystems;
     CachedTasks m_cachedTasks;
